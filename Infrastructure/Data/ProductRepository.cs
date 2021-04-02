@@ -38,15 +38,22 @@ namespace Infrastructure.Data
             //    .Include(p => p.ProductBrand)
             //    .Include(p => p.ProductType)
             //    .FirstOrDefaultAsync(p => p.Id == id);
+            //return product;
 
-            using(IDbConnection db = new SqliteConnection(ConfigurationAccessUtility.ConnectionString))
+
+            using (IDbConnection db = new SqliteConnection(ConfigurationAccessUtility.ConnectionString))
             {
                 var product = db.Query<Product>($"Select Id, Name, Description, Cast(Price as real) as Price, " +
                     $"PictureUrl, ProductTypeId, ProductBrandId from Products WHERE Id = {id}").FirstOrDefault();
-                product.ProductBrand = db.Query<ProductBrand>($"Select * from ProductBrands where Id = {product.ProductBrandId}").FirstOrDefault();
-                product.ProductType = db.Query<ProductType>($"Select * from ProductTypes where Id = {product.ProductTypeId}").FirstOrDefault();
 
-                return MapperWrapper.Mapper.Map<ProductToReturnDTO>(product);
+                if (product is not null)
+                {
+                    product.ProductBrand = db.Query<ProductBrand>($"Select * from ProductBrands where Id = {product.ProductBrandId}").FirstOrDefault();
+                    product.ProductType = db.Query<ProductType>($"Select * from ProductTypes where Id = {product.ProductTypeId}").FirstOrDefault();
+
+                    return MapperWrapper.Mapper.Map<ProductToReturnDTO>(product);
+                }
+                else return null;
 
 
 
@@ -61,7 +68,6 @@ namespace Infrastructure.Data
                 //    ProductType = product.ProductType.Name
                 //};
 
-                //return product;
                 //return result;
             }
         }
