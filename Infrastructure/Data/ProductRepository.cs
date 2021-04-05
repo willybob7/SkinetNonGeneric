@@ -4,10 +4,8 @@ using Core.Interfaces;
 using Dapper;
 using Infrastructure.Helpers;
 using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Data;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -43,6 +41,7 @@ namespace Infrastructure.Data
 
             using (IDbConnection db = new SqliteConnection(ConfigurationAccessUtility.ConnectionString))
             {
+                //use the "Cast(<columnName> as real) as <columnName>" workaround for decimals in Sqlite 
                 var product = db.Query<Product>($"Select Id, Name, Description, Cast(Price as real) as Price, " +
                     $"PictureUrl, ProductTypeId, ProductBrandId from Products WHERE Id = {id}").FirstOrDefault();
 
@@ -72,7 +71,7 @@ namespace Infrastructure.Data
             }
         }
 
-        public async Task<IReadOnlyList<ProductToReturnDTO>> GetProductsAsync()
+        public async Task<IReadOnlyList<ProductToReturnDTO>> GetProductsAsync(string sort, int? brandId, int? typeId)
         {
             //return  await _context.Products.AsNoTracking()
             //    .Include(p => p.ProductBrand)
@@ -82,8 +81,10 @@ namespace Infrastructure.Data
             using (IDbConnection db = new SqliteConnection(ConfigurationAccessUtility.ConnectionString))
             {
                 //use the "Cast(<columnName> as real) as <columnName>" workaround for decimals in Sqlite 
-                var products = db.Query<Product>($"Select Id, Name, Description, Cast(Price as real) as Price," +
-                    $" PictureUrl, ProductTypeId, ProductBrandId from Products").ToList();
+                var query = "Select Id, Name, Description, Cast(Price as real) as Price," +
+                    " PictureUrl, ProductTypeId, ProductBrandId from Products" + AddFiltering(brandId, typeId) + AddOrderByString(sort);
+
+                var products = db.Query<Product>(query).ToList();
                 var productBrandIds = products.Select(p => p.ProductBrandId).ToList();
                 var productTypeIds = products.Select(p => p.ProductTypeId).ToList();
                 var productBrands = db.Query<ProductBrand>("Select * from ProductBrands where Id in @IDs", new {IDs = productBrandIds}).ToList();
@@ -130,5 +131,42 @@ namespace Infrastructure.Data
                 return db.Query<ProductType>("Select * from ProductTypes").ToList();
             }
         }
+
+        private string AddOrderByString(string sort)
+        {
+            string orderBy;
+           
+            switch (sort)
+            {
+                case "priceAsc":
+                    orderBy = " ORDER BY Price";
+                    break;
+                case "priceDesc":
+                    orderBy = " ORDER BY Price desc";
+                    break;
+                default:
+                    orderBy = " ORDER BY Name";
+                    break;
+            }
+
+            return orderBy;
+        }
+
+        private string AddFiltering(int? brandId, int? typeId)
+        {
+            string filter = "";
+
+            if (brandId is not null)
+                filter += $" WHERE ProductBrandId = {brandId}";
+
+            if(typeId is not null)
+                if (!string.IsNullOrEmpty(filter))
+                    filter += $" AND ProductTypeId = {typeId}";
+                else
+                    filter += $" WHERE ProductTypeId = {typeId}";
+
+            return filter;
+        }
+
     }
 }

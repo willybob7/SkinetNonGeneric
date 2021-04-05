@@ -20,7 +20,8 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<ProductToReturnDTO>>> GetProducts() => Ok(await _repo.GetProductsAsync());
+        public async Task<ActionResult<IReadOnlyList<ProductToReturnDTO>>> GetProducts(string sort, int? brandId, int? typeId) 
+            => Ok(await _repo.GetProductsAsync(sort, brandId, typeId));
 
         [HttpGet("{id}")]
         //these are tags to tell swagger what our responses can be
