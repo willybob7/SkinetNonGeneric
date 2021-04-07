@@ -4,3 +4,11 @@ this makes the database. "-p" tells ef which project to get entities from. "-o" 
 I think "-s" is for solution.
 
 	dotnet ef migrations add InitialCreate -p Infrastructure -s API -o Data/Migrations
+
+This is how you remove a migration
+
+	dotnet ef migrations remove -p Infrastructure -s API 
+
+This makes the database
+	database update
+

@@ -20,18 +20,20 @@ namespace API.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IReadOnlyList<ProductToReturnDTO>>> GetProducts(string sort, int? brandId, int? typeId) 
-            => Ok(await _repo.GetProductsAsync(sort, brandId, typeId));
+        // the [FromQuery] tag is needed if the controller method expects an object/class for the input
+        public async Task<ActionResult<Pagination<ProductToReturnDTO>>> GetProducts([FromQuery]ProductParams @params) 
+            => Ok(await _repo.GetProductsAsync(@params));
 
         [HttpGet("{id}")]
         //these are tags to tell swagger what our responses can be
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(typeof(ApiResponse), StatusCodes.Status404NotFound)]
         public async Task<ActionResult<ProductToReturnDTO>> GetProduct(int id)
         {
             var product = await _repo.GetProductByIdAsync(id);
 
-            if (product is null) return NotFound(new ApiResponse(404));
+            if (product is null) 
+                return NotFound(new ApiResponse(404));
 
             return Ok(product);
         }

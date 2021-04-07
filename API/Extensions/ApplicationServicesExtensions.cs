@@ -14,7 +14,8 @@ namespace API.Extensions
         {
             services.AddScoped<IProductRepository, ProductRepository>();
 
-            AutoMapperConfig.Configure();
+            //we're going for performance here, so we don't want this
+            //AutoMapperConfig.Configure();
 
             services.Configure<ApiBehaviorOptions>(options =>
             {
