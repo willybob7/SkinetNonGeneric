@@ -2,7 +2,6 @@
 using Core.Entities;
 using Core.Interfaces;
 using Dapper;
-using Infrastructure.Helpers;
 using Microsoft.Data.Sqlite;
 using System.Collections.Generic;
 using System.Data;
@@ -110,7 +109,7 @@ namespace Infrastructure.Data
                     Id = product.Id,
                     Name = product.Name,
                     Description = product.Description,
-                    PictureUrl = product.PictureUrl,
+                    PictureUrl = ConfigurationAccessUtility.ApiUrl + product.PictureUrl,
                     Price = product.Price,
                     ProductBrand = productBrands.FirstOrDefault(b => b.Id == product.ProductBrandId).Name,
                     ProductType = productTypes.FirstOrDefault(t => t.Id == product.ProductTypeId).Name
