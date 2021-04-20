@@ -54,7 +54,7 @@ namespace Infrastructure.Data
                         Id = product.Id,
                         Name = product.Name,
                         Description = product.Description,
-                        PictureUrl = product.PictureUrl,
+                        PictureUrl = ConfigurationAccessUtility.ApiUrl + product.PictureUrl,
                         Price = product.Price,
                         ProductBrand = product.ProductBrand.Name,
                         ProductType = product.ProductType.Name
@@ -205,7 +205,7 @@ namespace Infrastructure.Data
 
             if (@params.Search is not null)
                 if (!string.IsNullOrEmpty(filter))
-                    filter += $" AND LOWER(Name) LIKE %{@params.Search}%";
+                    filter += $" AND LOWER(Name) LIKE '%{@params.Search}%'";
                 else
                     filter += $" WHERE LOWER(Name) LIKE '%{@params.Search}%'";
 
