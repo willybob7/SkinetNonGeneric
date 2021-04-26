@@ -13,7 +13,7 @@
 
 a{
     text-decoration: none;
-    color: #343a40;
+    color: #9eacda;
 
     &.active{
         color: orange;
@@ -22,8 +22,16 @@ a{
 
 .logo {
     cursor: pointer;
+    background-color: #9eacda;
+    border-radius: 12px;
 
     &:focus{
         outline: none;
     }
+}
+
+#nav-bar{
+    z-index: 2000;
+    opacity: 1;
+    background-color: #343a40;
 }
