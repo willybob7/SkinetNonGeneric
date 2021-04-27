@@ -13,6 +13,7 @@ namespace API.Extensions
         public static IServiceCollection AddApplicationServices(this IServiceCollection services)
         {
             services.AddScoped<IProductRepository, ProductRepository>();
+            services.AddSingleton<IBasketRepository, BasketRepository>();
 
             //we're going for performance here, so we don't want this
             //AutoMapperConfig.Configure();
