@@ -5,3 +5,4 @@ appsettings.json
 *.db
 .suo
 .dtbcache.v2
+*.rdb
