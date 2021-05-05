@@ -2,14 +2,13 @@
 using Core.DTOs;
 using Core.Entities;
 using Core.Interfaces;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace API.Controllers
 {
-    
+
     public class ProductsController : BaseAPIController
     {
         private readonly IProductRepository _repo;
