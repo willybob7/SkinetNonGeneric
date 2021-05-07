@@ -37,5 +37,15 @@ namespace Infrastructure.Data
                 return Configuration.GetValue<string>("ApiUrl");
             }
         }
+
+        public static string IdentityConnectionString
+        {
+            get
+            {
+                return Configuration.GetValue<string>("ConnectionStrings:IdentityConnection");
+            }
+        }
+
+
     }
 }

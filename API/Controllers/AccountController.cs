@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using System.Linq;
 using Microsoft.EntityFrameworkCore;
+using Infrastructure.Identity;
 
 namespace API.Controllers
 {
@@ -48,9 +49,33 @@ namespace API.Controllers
             };
         }
 
+
+        [HttpPost("logout")]
+        public async Task<ActionResult<UserDto>> Logout()
+        {
+            var email = User.FindFirstValue(ClaimTypes.Email);
+
+            var user = await _userManager.FindByEmailAsync(email);
+
+            await _signInManager.SignOutAsync();
+
+            return new UserDto
+            {
+                Email = user.Email,
+                Token = $"{user.DisplayName} has been signed out",
+                Username = user.DisplayName
+            };
+        }
+
+
         [HttpPost("register")]
         public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
         {
+            if (CheckEmailExistsAsync(registerDto.Email).Result.Value)
+            {
+                return new BadRequestObjectResult(new ApiValidationErrorResponse { Errors = new[] { "Email address is in use" } });
+            }
+
             var user = new AppUser
             {
                 DisplayName = registerDto.DisplayName,
@@ -97,24 +122,31 @@ namespace API.Controllers
         }
 
         [HttpGet("address")]
-        public async Task<ActionResult<Address>> GetUserAddress()
+        public async Task<ActionResult<AddressDTO>> GetUserAddress()
         {
             var email = User.FindFirstValue(ClaimTypes.Email);
 
             var user = await _userManager.Users.AsNoTracking().Include(x => x.Address).SingleOrDefaultAsync(x => x.Email == email);
-
-            return user.Address;
+            return new AddressDTO
+            {
+                FirstName = user.Address.FirstName,
+                LastName = user.Address.LastName,
+                State = user.Address.State,
+                Street = user.Address.Street,
+                City = user.Address.City,
+                ZipCode = user.Address.ZipCode
+            };
         }
 
         [Authorize]
         [HttpPut("address")]
-        public async Task<ActionResult<Address>> UpdateUserAddress(Address address)
+        public async Task<ActionResult<AddressDTO>> UpdateUserAddress(AddressDTO address)
         {
             var email = User.FindFirstValue(ClaimTypes.Email);
 
             var user = await _userManager.Users.Include(x => x.Address).SingleOrDefaultAsync(x => x.Email == email);
 
-            if(user.Address is null)
+            if (user.Address is null)
             {
                 user.Address = new Address
                 {
@@ -122,7 +154,6 @@ namespace API.Controllers
                     AppUserId = user.Id
                 };
             }
-
 
             user.Address.FirstName = address.FirstName;
             user.Address.LastName = address.LastName;
@@ -134,7 +165,15 @@ namespace API.Controllers
             var result = await _userManager.UpdateAsync(user);
 
             if (result.Succeeded)
-                return Ok(user.Address);
+                return Ok(new AddressDTO
+                {
+                    FirstName = user.Address.FirstName,
+                    LastName = user.Address.LastName,
+                    State = user.Address.State,
+                    Street = user.Address.Street,
+                    City = user.Address.City,
+                    ZipCode = user.Address.ZipCode
+                });
 
             return BadRequest("Problem updating the user");
         }
