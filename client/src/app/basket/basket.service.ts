@@ -85,8 +85,8 @@ export class BasketService {
       this.basketTotalSource.next(null);
       localStorage.removeItem('basket_id');
     }, error => {
-      console.log(error)
-    })
+      console.log(error);
+    });
   }
 
   private calculateTotals(){

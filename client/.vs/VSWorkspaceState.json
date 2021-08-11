@@ -3,9 +3,13 @@
     "",
     "\\src",
     "\\src\\app",
+    "\\src\\app\\core",
+    "\\src\\app\\core\\nav-bar",
+    "\\src\\app\\shared",
+    "\\src\\app\\shared\\components",
     "\\src\\assets",
     "\\src\\environments"
   ],
-  "SelectedNode": "\\src\\app\\app.module.ts",
+  "SelectedNode": "\\src\\app\\core\\nav-bar\\nav-bar.component.html",
   "PreviewInSolutionExplorer": false
 }
